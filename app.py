@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from credentials import api_token, dev_key
+from credentials import api_token, dev_key, ytkanan_token, ythonest_token, ytabhinav_token
 import webapp2,urllib,urllib2,json,jinja2,os,datetime
 from google.appengine.ext import db
 from google.appengine.ext.webapp import template
@@ -16,8 +16,8 @@ class AlreadyTubed(db.Expando):
     url = db.StringProperty()
 
 class Cron(webapp2.RequestHandler):
-    def send_yo(self):
-        data = {'api_token':api_token}
+    def send_yo(self, token=api_token):
+        data = {'api_token':token}
         data = urllib.urlencode(data)
         request_object = urllib2.Request('http://api.justyo.co/yoall/', data)
         response = urllib2.urlopen(request_object)
@@ -40,41 +40,70 @@ class Cron(webapp2.RequestHandler):
         path = os.path.join(os.path.dirname(__file__), 'templates/yotube.html')
         self.response.out.write(template.render(path, template_values))
 
-    def get_hn(self):
-        hn_url = 'http://hnify.herokuapp.com/get/top'
-        response = json.loads(urllib2.urlopen(hn_url).read())
-        top = [i for i in response['stories'] if i['points'] > 500][0]
-        if top:
-            print top['link']
-            already_yoyed = [instance.url for instance in AlreadyYoyed.all().fetch(1000000)]
-            print already_yoyed
-            if top['link'] not in already_yoyed:
-                self.add_to_db(top['link'])
-                self.send_yo()
-
     def get_tube(self):
         youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION, developerKey=DEVELOPER_KEY)
+        self.get_kanan(youtube)
+        self.get_honest(youtube)
+        return self.get_abhinav(youtube)
 
+    def get_honest(self, youtube):
+        newest_video = self.get_playlist(youtube, 'PL86F4D497FD3CACCE')
+
+        already_tubed = [instance.url for instance in AlreadyTubed.all().fetch(1000000)]
+
+        if newest_video not in already_tubed:
+           self.add_to_db(newest_video)
+           self.send_yo(ythonest_token)
+           return newest_video
+
+        return already_tubed
+
+    def get_kanan(self, youtube):
+        newest_video = self.get_user(youtube, 'knngill')
+        already_tubed = [instance.url for instance in AlreadyTubed.all().fetch(1000000)]
+
+        if newest_video not in already_tubed:
+            self.add_to_db(newest_video)
+            self.send_yo(ytkanan_token)
+            return newest_video
+
+        return already_tubed
+
+    def get_abhinav(self, youtube):
+        newest_video = self.get_user(youtube, 'linkinparkreigns')
+        already_tubed = [instance.url for instance in AlreadyTubed.all().fetch(1000000)]
+
+        if newest_video not in already_tubed:
+            self.add_to_db(newest_video)
+            self.send_yo(ytabhinav_token)
+            return newest_video
+
+        return already_tubed
+
+    def get_user(self, youtube, user):
         channels_response = youtube.channels().list(
             part='contentDetails', 
-            forUsername='linkinparkreigns'
+            forUsername=user
         ).execute()['items'][0]['contentDetails']['relatedPlaylists']['uploads']
 
         playlistitems_response = youtube.playlistItems().list(
             playlistId=channels_response,
             part='id',
             maxResults=1
-        ).execute()['items'][0]['id']
+        ).execute()
 
-        already_tubed = [instance.url for instance in AlreadyTubed.all().fetch(1000000)]
+        newest_video = playlistitems_response['items'][0]['id']
+        return newest_video
 
-        if playlistitems_response not in already_tubed:
-            self.add_to_db(playlistitems_response)
-            self.send_yo()
-            return playlistitems_response
+    def get_playlist(self, youtube, playlist):
+        playlistitems_response = youtube.playlistItems().list(
+            part='contentDetails', 
+            playlistId=playlist,
+            maxResults=1
+        ).execute()
 
-        return already_tubed
-
+        newest_video = playlistitems_response['items'][0]['id']
+        return newest_video
 
 class Index(webapp2.RequestHandler):
     def get(self):
