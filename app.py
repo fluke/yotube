@@ -16,6 +16,39 @@ class AlreadyTubed(db.Expando):
     url = db.StringProperty()
 
 class Cron(webapp2.RequestHandler):
+
+    # Response to /cron
+    def get(self):
+        youtube_response = self.get_tube()
+
+        template_values = {
+            'response': youtube_response
+        }
+
+        path = os.path.join(os.path.dirname(__file__), 'templates/yotube.html')
+        self.response.out.write(template.render(path, template_values))
+
+    # Get latest video of yters
+    def get_tube(self):
+        youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION, developerKey=DEVELOPER_KEY)
+        already_tubed = [instance.url for instance in AlreadyTubed.all().fetch(1000000)]
+        self.get_abhinav(youtube, already_tubed)
+        self.get_honest(youtube, already_tubed)
+        return self.get_kanan(youtube, already_tubed)
+
+    # yters
+    def get_honest(self, youtube, db):
+        newest_video = self.get_playlist(youtube, 'PL86F4D497FD3CACCE')
+        return self.check_db(db, newest_video, ythonest_token)
+
+    def get_kanan(self, youtube, db):
+        newest_video = self.get_user(youtube, 'knngill')
+        return self.check_db(db, newest_video, ytkanan_token)
+
+    def get_abhinav(self, youtube, db):
+        newest_video = self.get_user(youtube, 'linkinparkreigns')
+        return self.check_db(db, newest_video, ytabhinav_token)
+
     def send_yo(self, token=api_token):
         data = {'api_token':token}
         data = urllib.urlencode(data)
@@ -27,58 +60,13 @@ class Cron(webapp2.RequestHandler):
         instance = AlreadyTubed()
         instance.url = url
         instance.put()
-
-    def get(self):
-        youtube_response = self.get_tube()
-
-        youtube_response = youtube_response
-
-        template_values = {
-            'response': youtube_response
-        }
-
-        path = os.path.join(os.path.dirname(__file__), 'templates/yotube.html')
-        self.response.out.write(template.render(path, template_values))
-
-    def get_tube(self):
-        youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION, developerKey=DEVELOPER_KEY)
-        self.get_kanan(youtube)
-        self.get_honest(youtube)
-        return self.get_abhinav(youtube)
-
-    def get_honest(self, youtube):
-        newest_video = self.get_playlist(youtube, 'PL86F4D497FD3CACCE')
-
-        already_tubed = [instance.url for instance in AlreadyTubed.all().fetch(1000000)]
-
-        if newest_video not in already_tubed:
-           self.add_to_db(newest_video)
-           self.send_yo(ythonest_token)
-           return newest_video
-
-        return already_tubed
-
-    def get_kanan(self, youtube):
-        newest_video = self.get_user(youtube, 'knngill')
-        already_tubed = [instance.url for instance in AlreadyTubed.all().fetch(1000000)]
-
-        if newest_video not in already_tubed:
-            self.add_to_db(newest_video)
-            self.send_yo(ytkanan_token)
-            return newest_video
-
-        return already_tubed
-
-    def get_abhinav(self, youtube):
-        newest_video = self.get_user(youtube, 'linkinparkreigns')
-        already_tubed = [instance.url for instance in AlreadyTubed.all().fetch(1000000)]
-
-        if newest_video not in already_tubed:
-            self.add_to_db(newest_video)
-            self.send_yo(ytabhinav_token)
-            return newest_video
-
-        return already_tubed
+        
+    def check_db (self, db, video, token=api_token):
+        if video not in db:
+            self.add_to_db(video)
+            self.send_yo(token)
+            return video
+        return db
 
     def get_user(self, youtube, user):
         channels_response = youtube.channels().list(
