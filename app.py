@@ -74,7 +74,7 @@ class Cron(webapp2.RequestHandler):
             forUsername=user
         ).execute()['items'][0]['contentDetails']['relatedPlaylists']['uploads']
 
-        playlistitems_response = youtube.playlistItems().list(
+        playlistitems_response = self.youtube.playlistItems().list(
             playlistId=channels_response,
             part='id',
             maxResults=1
