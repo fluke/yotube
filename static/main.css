@@ -1,0 +1,82 @@
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	font-family: 'Montserrat', sans-serif;
+	color: #fff;
+	font-size: 18px;
+	font-weight: bold;
+	text-transform: uppercase;
+}
+
+.yoheader {
+	background-color: #d14836!important;
+}
+
+.yotuber {
+	height: 120px;
+	padding: 23px 0;
+	font-size: 50px;
+	overflow: hidden;
+}
+
+p { word-break: break-all; margin-bottom: 0; }
+
+small {
+	text-transform: none;
+	font-size: 27px;
+	letter-spacing: 3.5px;
+}
+
+.yopic {
+	text-align: right;
+}
+
+img {
+	max-height: 100%;
+}
+
+@media screen and (max-width: 480px) {
+	.yopic {
+		display: none;
+	}
+	.yotuber {
+		height: auto;
+		font-size: 30px;
+		text-align: center;
+	}
+}
+
+.yotuber:nth-child(8n+1) {
+	background-color: #9b59b6;
+}
+
+.yotuber:nth-child(8n+2) {
+	background-color: #f1c40f;	
+}
+
+.yotuber:nth-child(8n+3) {
+	background-color: #2ecc71;
+}
+
+.yotuber:nth-child(8n+4) {
+	background-color: #3498db;
+}
+
+.yotuber:nth-child(8n+5) {
+	background-color: #34495e;
+}
+
+.yotuber:nth-child(8n+6) {
+	background-color: #16a085;
+}
+
+.yotuber:nth-child(8n+7) {
+	background-color: #2980b9;
+}
+
+.yotuber:nth-child(8n) {
+	background-color: #8e44ad;
+}
