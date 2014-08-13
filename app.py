@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from credentials import api_token
+from credentials import api_token, dev_key
 import webapp2,urllib,urllib2,json,jinja2,os,datetime
 from google.appengine.ext import db
 from google.appengine.ext.webapp import template
@@ -7,7 +7,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from oauth2client.tools import argparser
 
-DEVELOPER_KEY = "AIzaSyBU9eMQ1xW0NNEGprJIR5wgaQdrTFn_Fdc"
+DEVELOPER_KEY = dev_key
 YOUTUBE_API_SERVICE_NAME = "youtube"
 YOUTUBE_API_VERSION = "v3"
 
