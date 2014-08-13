@@ -16,13 +16,12 @@ body {
 }
 
 .yotuber {
-	height: 120px;
-	padding: 23px 0;
+	padding: 18px 0;
 	font-size: 50px;
 	overflow: hidden;
 }
 
-p { word-break: break-all; margin-bottom: 0; }
+p { word-break: break-all; margin-bottom: 0; margin-top: 4px; }
 
 small {
 	text-transform: none;
@@ -35,10 +34,11 @@ small {
 }
 
 img {
-	max-height: 100%;
+	max-height: 100;
+	border-radius: 50%;
 }
 
-@media screen and (max-width: 480px) {
+@media screen and (max-width: 768px) {
 	.yopic {
 		display: none;
 	}
